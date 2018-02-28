@@ -3,17 +3,17 @@
 var map;
 
 // Create a new blank array for all the listing markers.
-var markers = [];
+//var markers = [];
 
 // Create placemarkers array to use in multiple functions to have control
 // over the number of places that show.
-var placeMarkers = [];
+//var placeMarkers = [];
 //}
 //this initMap is a massive function
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 64.1265, lng: -21.8174},
-    zoom: 15
+    zoom: 11
   });
   // These are the locations that will be shown to the user.
   var locations = [
