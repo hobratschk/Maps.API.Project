@@ -30,12 +30,12 @@ function initMap() {
     {title: 'Open Air Museum', location: {lat: 64.118852, lng: -21.816203}},
     {title: 'Micro Bar', location: {lat: 64.148594, lng: -21.94075399999997}},
     {title: 'Eyja Guldsmeden Hotel', location: {lat: 64.142033, lng: -21.907347}},
-    {title: 'Hotel Kriunes', location: {lat: 64.088630, lng: -21.794383}},
+    {title: 'Hote Kriunes', location: {lat: 64.088630, lng: -21.794383}},
     {title: 'Room With a View', location: {lat: 64.145732, lng: -21.930194}},
     {title: 'Discover Iceland Private Tours ', location: {lat: 64.127738, lng: -21.81591400000002}}
   ];
 
-  //var largeInfowindow = new google.maps.InfoWindow();
+  var largeInfowindow = new google.maps.InfoWindow();
 
   //use location array to create an array of markers on initMap
   for (var i = 0; i < locations.length; i++) {
@@ -52,9 +52,23 @@ function initMap() {
     //push marker to array of markers
     markers.push(marker);
     //create onclick event to open an infowindow at each marker
-    //marker.addlistener('click', function() {
-      //populateInfoWindow(this, largeInfowindow);
-    };
+    marker.addListener('click', function() {
+      populateInfoWindow(this, largeInfowindow);
+    });
+  }
+
+  //this function populates infowindow when marker is clicked. only allow one
+  //infowindow and populate based on marker's position
+  function populateInfoWindow(marker, infowindow) {
+    if (infowindow.marker != marker) {
+      infowindow.marker = marker;
+      infowindow.setContent('<div>' + marker.title + '</div>');
+      infowindow.open(map, marker);
+      //make sure marker property is cleared if infowindow is closed
+      infowindow.addListener('closeclick', function(){
+        infowindow.setMarker(null);
+      });
+    }
+  }
 }
-//}
 //ko.applybindings(new ViewModel());
