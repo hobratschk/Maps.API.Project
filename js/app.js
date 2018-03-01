@@ -29,6 +29,9 @@ function initMap() {
     {title: 'The Settlement Exhibition', location: {lat: 64.147294, lng: -21.942686999999978}},
     {title: 'Open Air Museum', location: {lat: 64.118852, lng: -21.816203}},
     {title: 'Micro Bar', location: {lat: 64.148594, lng: -21.94075399999997}},
+    {title: 'Eyja Guldsmeden Hotel', location: {lat: 64.142033, lng: -21.907347}},
+    {title: 'Hote Kriunes', location: {lat: 64.088630, lng: -21.794383}},
+    {title: 'Room With a View', location: {lat: 64.145732, lng: -21.930194}},
     {title: 'Discover Iceland Private Tours ', location: {lat: 64.127738, lng: -21.81591400000002}}
   ];
 
