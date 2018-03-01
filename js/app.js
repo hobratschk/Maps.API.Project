@@ -3,7 +3,7 @@
 var map;
 
 // Create a new blank array for all the listing markers.
-//var markers = [];
+var markers = [];
 
 // Create placemarkers array to use in multiple functions to have control
 // over the number of places that show.
@@ -11,9 +11,10 @@ var map;
 //}
 //this initMap is a massive function
 function initMap() {
+  //create new map instance
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 64.1265, lng: -21.8174},
-    zoom: 11
+    zoom: 12
   });
   // These are the locations that will be shown to the user.
   var locations = [
@@ -30,5 +31,27 @@ function initMap() {
     {title: 'Micro Bar', location: {lat: 64.148594, lng: -21.94075399999997}},
     {title: 'Discover Iceland Private Tours ', location: {lat: 64.127738, lng: -21.81591400000002}}
   ];
+
+  //var largeInfowindow = new google.maps.InfoWindow();
+
+  //use location array to create an array of markers on initMap
+  for (var i = 0; i < locations.length; i++) {
+    var position = locations[i].location;
+    var title = locations[i].title;
+    //create marker per location and put into markers array
+    var marker = new google.maps.Marker({
+      map: map,
+      position: position,
+      title: title,
+      animation: google.maps.Animation.DROP,
+      id: i
+    })
+    //push marker to array of markers
+    markers.push(marker);
+    //create onclick event to open an infowindow at each marker
+    //marker.addlistener('click', function() {
+      //populateInfoWindow(this, largeInfowindow);
+    };
 }
+//}
 //ko.applybindings(new ViewModel());
