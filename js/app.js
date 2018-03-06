@@ -7,35 +7,40 @@ var markers = [];
 
 // Create placemarkers array to use in multiple functions to have control
 // over the number of places that show.
-//var placeMarkers = [];
+var placeMarkers = [];
 //}
 //this initMap is a massive function
 function initMap() {
   //create new map instance
   map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: 64.1265, lng: -21.8174},
-    zoom: 12
+    center: {lat: 32.7767, lng: -96.7970},
+    zoom: 13
   });
   // These are the locations that will be shown to the user.
   var locations = [
-    {title: 'Hallgrims Church', location: {lat: 64.1417149, lng: -21.926637000000028}},
-    {title: 'Sjavargrillid - Icelandic Fare', location: {lat: 64.1451621, lng: -21.931513799999948}},
-    {title: 'Fish Company - Seafood', location: {lat: 64.148892, lng: -21.941663000000062}},
-    {title: 'Gateway to Iceland', location: {lat: 64.0960051, lng: -21.88051740000003}},
-    {title: 'Viking Horses', location: {lat: 64.0989867, lng: -21.741337199999975}},
-    {title: 'Lebowski Bar', location: {lat: 64.1457063, lng: -21.929545500000017}},
-    {title: 'Micro Bar', location: {lat: 64.148594, lng: -21.94075399999997}},
-    {title: 'National Museum of Iceland', location: {lat: 64.14164629999999, lng: -21.948570099999984}},
-    {title: 'The Settlement Exhibition', location: {lat: 64.147294, lng: -21.942686999999978}},
-    {title: 'Open Air Museum', location: {lat: 64.118852, lng: -21.816203}},
-    {title: 'Micro Bar', location: {lat: 64.148594, lng: -21.94075399999997}},
-    {title: 'Eyja Guldsmeden Hotel', location: {lat: 64.142033, lng: -21.907347}},
-    {title: 'Hotel Kriunes', location: {lat: 64.088630, lng: -21.794383}},
-    {title: 'Room With a View', location: {lat: 64.145732, lng: -21.930194}},
-    {title: 'Discover Iceland Private Tours ', location: {lat: 64.127738, lng: -21.81591400000002}}
+    {title: 'Cidercade', location: {lat: 32.8056605, lng: -96.84654390000003}},
+    {title: 'Koryo Kalbi Korean BBQ', location: {lat: 32.895487, lng: -96.89316259999998}},
+    {title: 'Meso Maya Comida Y Copas', location: {lat: 32.787801, lng: -96.80496040000003}},
+    {title: 'The Mansion Restaurant', location: {lat: 32.8041117, lng: -96.80734359999997}},
+    {title: 'Cane Rosso', location: {lat: 32.78248110000001, lng: -96.78549859999998}},
+    {title: 'Grapevine Bar', location: {lat: 32.8053771, lng: -96.81501279999998}},
+    {title: 'Bowen House', location: {lat: 32.7979765, lng: -96.80196539999997}},
+    {title: 'Louie Louies Piano Bar', location: {lat: 32.7842788, lng: -96.78633539999998}},
+    {title: 'Dallas Museum of Art', location: {lat: 32.7875631, lng: -96.80102369999997}},
+    {title: 'The Samurai Collection', location: {lat: 32.7915351, lng: -96.8062554}},
+    {title: 'Perot Museum of Nature and Science', location: {lat: 32.7868362, lng: -96.8066938}},
+    {title: 'Reunion Tower', location: {lat: 32.7757814, lng: -96.809279}},
+    {title: 'Crown Plaza Dallas Downtown', location: {lat: 32.7808672, lng: -96.80374710000001}},
+    {title: 'Magnolia Hotel', location: {lat: 32.7801662, lng: -96.7990567}},
+    {title: 'Aloft Dallas Downtown', location: {lat: 32.7771609, lng: -96.80106560000002}}
   ];
 
-  var largeInfowindow = new google.maps.InfoWindow();
+  //var largeInfowindow = new google.maps.InfoWindow();
+  var infowindow = new google.maps.InfoWindow();
+
+  //adjust boundaries of map to fit filtered places, this creates new LatLng
+  //instance which captures SW and NE corners of viewport
+  var bounds = new google.maps.LatLngBounds();
 
   //use location array to create an array of markers on initMap
   for (var i = 0; i < locations.length; i++) {
@@ -51,12 +56,16 @@ function initMap() {
     })
     //push marker to array of markers
     markers.push(marker);
+
+    //extend boundaries of map for each marker
+    bounds.extend(marker.position);
+
     marker.addListener ('click', function() {
       toggleBounce(this);
     });
     //create onclick event to open an infowindow at each marker
     marker.addListener('click', function() {
-      populateInfoWindow(this, largeInfowindow);
+      populateInfoWindow(this, infowindow);
     });
   }
 
@@ -72,9 +81,10 @@ function initMap() {
         infowindow.setContent(null);
       });
     }
+    map.fitBounds(bounds);
   }
 
-//function toggles the bounce, and the setTimout piece limits to approx 5 bounces
+//thg\is function toggles the bounce, and the setTimout piece limits to approx 5 bounces
 //each bounce approx 700 ms
 //source: https://stackoverflow.com/questions/7339200/bounce-a-pin-in-google-maps-once
   function toggleBounce(marker) {
