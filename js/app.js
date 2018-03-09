@@ -19,7 +19,7 @@ function initMap() {
   // These are the locations that will be shown to the user.
   var locations = [
     {title: 'Cidercade', location: {lat: 32.8056605, lng: -96.84654390000003}},
-    {title: 'Koryo Kalbi Korean BBQ', location: {lat: 32.895487, lng: -96.89316259999998}},
+    {title: 'Gui Sushi Korean Japanese Bistro and Bar', location: {lat: 32.79848640000001, lng: -96.8014632}},
     {title: 'Meso Maya Comida Y Copas', location: {lat: 32.787801, lng: -96.80496040000003}},
     {title: 'The Mansion Restaurant', location: {lat: 32.8041117, lng: -96.80734359999997}},
     {title: 'Cane Rosso', location: {lat: 32.78248110000001, lng: -96.78549859999998}},
@@ -67,20 +67,33 @@ function initMap() {
     marker.addListener('click', function() {
       populateInfoWindow(this, infowindow);
     });
+    map.fitBounds(bounds);
   }
 
   //this function populates infowindow when marker is clicked. only allow one
   //infowindow and populate based on marker's position
   function populateInfoWindow(marker, infowindow) {
+    var latlng = marker.position;
     if (infowindow.marker != marker) {
       infowindow.marker = marker;
-      infowindow.setContent('<div>' + marker.title + '</div>');
-      infowindow.open(map, marker);
+      infowindow.setContent('');
       //make sure marker property is cleared if infowindow is closed
       infowindow.addListener('closeclick', function(){
         infowindow.setContent(null);
       });
-    }
+
+      var geocoder = new google.maps.Geocoder();
+        geocoder.geocode({'latLng': latlng}, function (results, status) {
+          if (status == google.maps.GeocoderStatus.OK) {
+            infowindow.setContent('<div>' + marker.title + '</div>' + '<div>' +
+            results[0].formatted_address + '</div>');
+          } else {
+            infowindow.setContent('<div>' + marker.title + '</div>' +
+              '<div>No Address Found</div>');
+          }
+        })
+      }
+    infowindow.open(map, marker);
     map.fitBounds(bounds);
   }
 
@@ -94,7 +107,7 @@ function initMap() {
       marker.setAnimation(google.maps.Animation.BOUNCE);
       setTimeout(function() {
         marker.setAnimation(null);
-      }, 3500);
+      }, 2800);
     }
   }
 }
