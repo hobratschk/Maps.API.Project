@@ -9,6 +9,17 @@ var markers = [];
 // over the number of places that show.
 var placeMarkers = [];
 //}
+
+//toggles options box
+function toggleMenu() {
+  var x = document.getElementById("options-box");
+  if (x.style.display ==="none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
+
 //this initMap is a massive function
 function initMap() {
   //create new map instance
@@ -73,7 +84,6 @@ function initMap() {
   //this function populates infowindow when marker is clicked. only allow one
   //infowindow and populate based on marker's position
   function populateInfoWindow(marker, infowindow) {
-    var latlng = marker.position;
     if (infowindow.marker != marker) {
       infowindow.marker = marker;
       infowindow.setContent('');
@@ -81,8 +91,11 @@ function initMap() {
       infowindow.addListener('closeclick', function(){
         infowindow.setContent(null);
       });
-
+      //set latlng var to pass into geocoder - required for geocoder
+      var latlng = marker.position;
       var geocoder = new google.maps.Geocoder();
+      //geocoder needs {'latLng': xyz} and results and status since your working
+      //with results and status in the function
         geocoder.geocode({'latLng': latlng}, function (results, status) {
           if (status == google.maps.GeocoderStatus.OK) {
             infowindow.setContent('<div>' + marker.title + '</div>' + '<div>' +
