@@ -22,25 +22,6 @@
   right: 0px;
 }
 
-/*@media (max-width: 767px) {
-  #side-menu {
-    position: relative;
-    width: 100%;
-    margin-bottom: 10px;
-  }
-
-}*/
-
-/*@media (min-width: 767px) {
-  #side-menu {
-    display: block;
-  }
-
-  #map {
-    display: absolute;
-  }
-}*/
-
 body {
   font-family: Arial, sans-serif;
   height: 100%;
