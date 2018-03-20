@@ -10,22 +10,12 @@ var markers = [];
 var placeMarkers = [];
 //}
 
-//toggles options box
-function toggleMenu() {
-  var x = document.getElementById("options-box");
-  if (x.style.display ==="none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-}
-
 //this initMap is a massive function
 function initMap() {
   //create new map instance
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 32.7767, lng: -96.7970},
-    zoom: 13
+    zoom: 8
   });
   // These are the locations that will be shown to the user.
   var locations = [
@@ -124,5 +114,17 @@ function initMap() {
     }
   }
 }
+
+//toggles side menu, if side menu hidden it moves map left, if side menu shown
+//moves map right - don't need bootstraps collapse function now
+$("#button1").click(function(){
+  if ($("#side-menu").is(":visible")) {
+    $("#side-menu").hide();
+    $("#map").css({"right": "25%"});
+  } else {
+    $("#side-menu").show();
+    $("#map").css({"right": "0px"});
+  }
+});
 
 //ko.applybindings(new ViewModel());
