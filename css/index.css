@@ -18,6 +18,14 @@
   height: 91vh;
 }
 
+#places-search {
+  width: 74%;
+}
+
+#go-places {
+  width: 21%;
+}
+
 body {
   font-family: Arial, sans-serif;
   height: 100%;

@@ -6,7 +6,8 @@ var map;
 var markers = [];
 
 // Create placemarkers array to use in multiple functions to have control
-// over the number of places that show.
+// over the number of places that show - separate from locations that load with
+//page
 var placeMarkers = [];
 //}
 
@@ -17,6 +18,14 @@ function initMap() {
     center: {lat: 32.7767, lng: -96.7970},
     zoom: 8
   });
+
+  //searchbox to execute a places search
+  var searchBox = new google.maps.places.SearchBox(
+    document.getElementById('places-search'));
+
+  //bias the boundaries within the map for searchAutocomplete
+  searchBox.setBounds(map.getBounds());
+
   // These are the locations that will be shown to the user.
   var locations = [
     {title: 'Cidercade', location: {lat: 32.8056605, lng: -96.84654390000003}},
@@ -74,33 +83,31 @@ function initMap() {
   //this function populates infowindow when marker is clicked. only allow one
   //infowindow and populate based on marker's position
   function populateInfoWindow(marker, infowindow) {
-    if (infowindow.marker != marker) {
-      infowindow.marker = marker;
-      infowindow.setContent('');
-      //make sure marker property is cleared if infowindow is closed
-      infowindow.addListener('closeclick', function(){
-        infowindow.setContent(null);
-      });
-      //set latlng var to pass into geocoder - required for geocoder
-      var latlng = marker.position;
-      var geocoder = new google.maps.Geocoder();
-      //geocoder needs {'latLng': xyz} and results and status since your working
-      //with results and status in the function
-        geocoder.geocode({'latLng': latlng}, function (results, status) {
-          if (status == google.maps.GeocoderStatus.OK) {
-            infowindow.setContent('<div>' + marker.title + '</div>' + '<div>' +
-            results[0].formatted_address + '</div>');
-          } else {
-            infowindow.setContent('<div>' + marker.title + '</div>' +
-              '<div>No Address Found</div>');
-          }
-        })
-      }
+    infowindow.marker = marker;
+    infowindow.setContent('');
+    //make sure marker property is cleared if infowindow is closed
+    infowindow.addListener('closeclick', function(){
+      infowindow.setContent(null);
+    });
+    //set latlng var to pass into geocoder - required for geocoder
+    var latlng = marker.position;
+    var geocoder = new google.maps.Geocoder();
+    //geocoder needs {'latLng': xyz} and results and status since your working
+    //with results and status in the function
+      geocoder.geocode({'latLng': latlng}, function (results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+          infowindow.setContent('<div>' + marker.title + '</div>' + '<div>' +
+          results[0].formatted_address + '</div>');
+        } else {
+          infowindow.setContent('<div>' + marker.title + '</div>' +
+            '<div>No Address Found</div>');
+        }
+      })
     infowindow.open(map, marker);
     map.fitBounds(bounds);
   }
 
-//thg\is function toggles the bounce, and the setTimout piece limits to approx 5 bounces
+//this function toggles the bounce, and the setTimout piece limits to approx 4 bounces
 //each bounce approx 700 ms
 //source: https://stackoverflow.com/questions/7339200/bounce-a-pin-in-google-maps-once
   function toggleBounce(marker) {
@@ -113,18 +120,89 @@ function initMap() {
       }, 2800);
     }
   }
+
+  //toggles side menu, if side menu hidden it moves map left, if side menu shown
+  //moves map right - don't need bootstraps collapse function now
+  $("#button1").click(function(){
+    if ($("#side-menu").is(":visible")) {
+      $("#side-menu").hide();
+      $("#map").css({"right": "25%"});
+    } else {
+      $("#side-menu").show();
+      $("#map").css({"right": "0px"});
+    }
+  });
+
+  //listen for event fired when user selects a prediction from piicklist
+  //and retrieve more details for that place
+  searchBox.addListener('places_changed', function() {
+    searchBoxPlaces(this);
+  });
+
+  //listen for event fired when user selects prediction and clicks "go"
+  document.getElementById('go-places').addEventListener('click', textSearchPlaces);
+//closes initMap
 }
 
-//toggles side menu, if side menu hidden it moves map left, if side menu shown
-//moves map right - don't need bootstraps collapse function now
-$("#button1").click(function(){
-  if ($("#side-menu").is(":visible")) {
-    $("#side-menu").hide();
-    $("#map").css({"right": "25%"});
-  } else {
-    $("#side-menu").show();
-    $("#map").css({"right": "0px"});
+function hideMarkers(markers) {
+  for (var i = 0; i < markers.length; i++) {
+    markers[i].setMap(null);
   }
-});
+}
+
+function searchBoxPlaces(searchBox) {
+  hideMarkers(placeMarkers);
+  var places = searchBox.getPlaces();
+  //for each place, get the icon, name and location
+  createMarkersForPlaces(places);
+  if (places.length == 0) {
+    window.alert('We did not find any places matching that search!');
+  }
+}
+
+//function fires when user selects "go" on the places search, uses query string or place
+function textSearchPlaces() {
+  var bounds = map.getBounds();
+  hideMarkers(placeMarkers);
+  var placesService = new google.maps.places.PlacesService(map);
+  placesService.textSearch({
+    query: document.getElementById('places-search').value,
+    bounds: bounds
+  }, function(results, status) {
+    if (status === google.maps.places.PlacesServiceStatus.OK) {
+      createMarkersForPlaces(results);
+    }
+  });
+}
+
+//creates markers for each place found in either places search
+function createMarkersForPlaces(places) {
+  var bounds = new google.maps.LatLngBounds();
+  for (var i = 0; i < places.length; i++) {
+    var place = places[i];
+    var icon = {
+      url: place.icon,
+      size: new google.maps.Size(35, 35),
+      origin: new google.maps.Point(0, 0),
+      anchor: new google.maps.Point(15, 34),
+      scaledSize: new google.maps.Size(25, 25)
+    };
+    //create marker for each place
+    var marker = new google.maps.Marker({
+      map: map,
+      icon: icon,
+      title: place.name,
+      position: place.geometry.location,
+      id: place.id
+    });
+    placeMarkers.push(marker);
+    if (place.geometry.viewport) {
+      bounds.union(place.geometry.viewport);
+    } else {
+      bounds.extend(place.geometry.location);
+    }
+  }
+  map.fitBounds(bounds);
+}
 
 //ko.applybindings(new ViewModel());
