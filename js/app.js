@@ -73,6 +73,7 @@ function initMap() {
     marker.addListener ('click', function() {
       toggleBounce(this);
     });
+
     //create onclick event to open an infowindow at each marker
     marker.addListener('click', function() {
       populateInfoWindow(this, infowindow);
@@ -133,7 +134,7 @@ function initMap() {
     }
   });
 
-  //listen for event fired when user selects a prediction from piicklist
+  //listen for event fired when user selects a prediction from picklist
   //and retrieve more details for that place
   searchBox.addListener('places_changed', function() {
     searchBoxPlaces(this);
@@ -144,6 +145,7 @@ function initMap() {
 //closes initMap
 }
 
+//loops thru and hides markers
 function hideMarkers(markers) {
   for (var i = 0; i < markers.length; i++) {
     markers[i].setMap(null);
@@ -151,7 +153,7 @@ function hideMarkers(markers) {
 }
 
 function searchBoxPlaces(searchBox) {
-  hideMarkers(placeMarkers);
+  hideMarkers(markers);
   var places = searchBox.getPlaces();
   //for each place, get the icon, name and location
   createMarkersForPlaces(places);
@@ -163,7 +165,7 @@ function searchBoxPlaces(searchBox) {
 //function fires when user selects "go" on the places search, uses query string or place
 function textSearchPlaces() {
   var bounds = map.getBounds();
-  hideMarkers(placeMarkers);
+  hideMarkers(markers);
   var placesService = new google.maps.places.PlacesService(map);
   placesService.textSearch({
     query: document.getElementById('places-search').value,
