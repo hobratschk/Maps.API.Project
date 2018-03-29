@@ -154,6 +154,7 @@ function hideMarkers(markers) {
 
 function searchBoxPlaces(searchBox) {
   hideMarkers(markers);
+  //getPlaces is a searchBox method
   var places = searchBox.getPlaces();
   //for each place, get the icon, name and location
   createMarkersForPlaces(places);
@@ -206,5 +207,35 @@ function createMarkersForPlaces(places) {
   }
   map.fitBounds(bounds);
 }
+console.log(placeMarkers);
+console.log(markers);
 
+/*
+var placesLength = placeMarkers.length;
+var temp;
+
+for (i = 0; i < placesLength; i++) {
+  temp = document.createElement('div');
+  temp.className = 'results';
+  temp.innerHTML = placeMarkers[i].title;
+  document.getElementById('placesList')[0].appendChild(temp);
+}*/
+
+
+/*$.each(placeMarkers, function(index, value) {
+  $('<div />', {
+    'text': placeMarkers[i].title
+  }).appendTo('placesList');
+});*/
+
+/*function createList(placeMarkers) {
+//  var placesLength = placeMarkers.length;
+  var listOfPlaces = document.getElementById("placesList");
+  for (var i = 0; i < placesLength; i++) {
+    var newDiv = document.createElement('div');
+    newDiv.innerHTML = placeMarkers[i].title;
+    listOfPlaces.appendChild(newDiv);
+  }
+}
+createList();*/
 //ko.applybindings(new ViewModel());
