@@ -142,6 +142,8 @@ function initMap() {
 
   //listen for event fired when user selects prediction and clicks "go"
   document.getElementById('go-places').addEventListener('click', textSearchPlaces);
+//creates a list of location on left sidebar (createsList function defined at bottom)
+createList(locations);
 //closes initMap
 }
 
@@ -208,7 +210,7 @@ function createMarkersForPlaces(places) {
   map.fitBounds(bounds);
 }
 console.log(placeMarkers);
-console.log(markers);
+console.log(locations);
 
 /*
 var placesLength = placeMarkers.length;
@@ -221,21 +223,20 @@ for (i = 0; i < placesLength; i++) {
   document.getElementById('placesList')[0].appendChild(temp);
 }*/
 
-
 /*$.each(placeMarkers, function(index, value) {
   $('<div />', {
     'text': placeMarkers[i].title
   }).appendTo('placesList');
 });*/
 
-/*function createList(placeMarkers) {
-//  var placesLength = placeMarkers.length;
-  var listOfPlaces = document.getElementById("placesList");
+function createList(locations) {
+  var placesLength = locations.length;
+  var listOfPlaces = document.getElementById('placesList');
   for (var i = 0; i < placesLength; i++) {
     var newDiv = document.createElement('div');
-    newDiv.innerHTML = placeMarkers[i].title;
+    newDiv.innerHTML = locations[i].title;
     listOfPlaces.appendChild(newDiv);
   }
 }
-createList();*/
+/*createList(locations);*/
 //ko.applybindings(new ViewModel());
