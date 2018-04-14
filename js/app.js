@@ -16,15 +16,15 @@ function initMap() {
   //create new map instance
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 32.7767, lng: -96.7970},
-    zoom: 8
+    zoom: 8,
+    mapTypeControl: false
   });
 
   //searchbox to execute a places search
   var searchBox = new google.maps.places.SearchBox(
     document.getElementById('places-search'));
-
-  //bias the boundaries within the map for searchAutocomplete
-  searchBox.setBounds(map.getBounds());
+    //bias the boundaries within the map
+    searchBox.setBounds(map.getBounds());
 
   // These are the locations that will be shown to the user.
   var locations = [
@@ -142,22 +142,25 @@ function initMap() {
 
   //listen for event fired when user selects prediction and clicks "go"
   document.getElementById('go-places').addEventListener('click', textSearchPlaces);
-//creates a list of location on left sidebar (createsList function defined at bottom)
-createList(locations);
+  //creates a list of location on left sidebar (createsList function defined at bottom)
+  createListInit(locations);
 //closes initMap
 }
 
 //loops thru and hides markers
-function hideMarkers(markers) {
-  for (var i = 0; i < markers.length; i++) {
-    markers[i].setMap(null);
+function hideMarkers(x) {
+  for (var i = 0; i < x.length; i++) {
+    x[i].setMap(null);
   }
 }
 
 function searchBoxPlaces(searchBox) {
   hideMarkers(markers);
+  hideMarkers(placeMarkers);
   //getPlaces is a searchBox method
   var places = searchBox.getPlaces();
+  createListForClickAndGo(places);
+  console.log(places);
   //for each place, get the icon, name and location
   createMarkersForPlaces(places);
   if (places.length == 0) {
@@ -165,10 +168,11 @@ function searchBoxPlaces(searchBox) {
   }
 }
 
-//function fires when user selects "go" on the places search, uses query string or place
+//function fires when user selects "go" on the places search, uses query string
 function textSearchPlaces() {
   var bounds = map.getBounds();
   hideMarkers(markers);
+  hideMarkers(placeMarkers);
   var placesService = new google.maps.places.PlacesService(map);
   placesService.textSearch({
     query: document.getElementById('places-search').value,
@@ -177,6 +181,7 @@ function textSearchPlaces() {
     if (status === google.maps.places.PlacesServiceStatus.OK) {
       createMarkersForPlaces(results);
     }
+    createListForClickAndGo(results);
   });
 }
 
@@ -209,34 +214,30 @@ function createMarkersForPlaces(places) {
   }
   map.fitBounds(bounds);
 }
-console.log(placeMarkers);
-console.log(locations);
 
-/*
-var placesLength = placeMarkers.length;
-var temp;
-
-for (i = 0; i < placesLength; i++) {
-  temp = document.createElement('div');
-  temp.className = 'results';
-  temp.innerHTML = placeMarkers[i].title;
-  document.getElementById('placesList')[0].appendChild(temp);
-}*/
-
-/*$.each(placeMarkers, function(index, value) {
-  $('<div />', {
-    'text': placeMarkers[i].title
-  }).appendTo('placesList');
-});*/
-
-function createList(locations) {
-  var placesLength = locations.length;
+function createListInit(x) {
+  var placesLength = x.length;
   var listOfPlaces = document.getElementById('placesList');
   for (var i = 0; i < placesLength; i++) {
     var newDiv = document.createElement('div');
-    newDiv.innerHTML = locations[i].title;
+    newDiv.innerHTML = x[i].title;
     listOfPlaces.appendChild(newDiv);
   }
 }
-/*createList(locations);*/
+
+function createListForClickAndGo(x) {
+  clearList();
+  var placesLength = x.length;
+  var listOfPlaces = document.getElementById('placesList');
+  for (var i = 0; i < placesLength; i++) {
+    var newDiv = document.createElement('div');
+    newDiv.innerHTML = x[i].name;
+    listOfPlaces.appendChild(newDiv);
+  }
+}
+
+function clearList() {
+  $('#placesList').empty();
+}
+
 //ko.applybindings(new ViewModel());
