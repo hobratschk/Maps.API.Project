@@ -11,6 +11,9 @@ var markers = [];
 var placeMarkers = [];
 //}
 
+//openweathermap.org api gets this var
+var weather = {};
+
 //this initMap is a massive function
 function initMap() {
   //create new map instance
@@ -90,6 +93,8 @@ function initMap() {
     infowindow.addListener('closeclick', function(){
       infowindow.setContent(null);
     });
+    //use temp and humidity from openweather.org API
+    //var weather = weather;
     //set latlng var to pass into geocoder - required for geocoder
     var latlng = marker.position;
     var geocoder = new google.maps.Geocoder();
@@ -98,10 +103,12 @@ function initMap() {
       geocoder.geocode({'latLng': latlng}, function (results, status) {
         if (status == google.maps.GeocoderStatus.OK) {
           infowindow.setContent('<div>' + marker.title + '</div>' + '<div>' +
-          results[0].formatted_address + '</div>');
+          results[0].formatted_address + '</div>' + '<div>' + "Temp: " + weather.temp +
+          "&deg;F" + '</div>' + '<div>' + "Humidity: " + weather.humidity + "%" + '</div>');
         } else {
-          infowindow.setContent('<div>' + marker.title + '</div>' +
-            '<div>No Address Found</div>');
+          infowindow.setContent('<div>' + marker.title + '</div>' + '<div>' +
+          "Temp: " + weather.temp + "&deg;F" + '</div>' + '<div>' + "Humidity: "
+          + weather.humidity + "%" + '</div>' + '<div>' + "No Address Found" + '</div>');
         }
       })
     infowindow.open(map, marker);
@@ -238,6 +245,55 @@ function createListForClickAndGo(x) {
 
 function clearList() {
   $('#placesList').empty();
+}
+
+//everything below is for openweather.org API
+//used Captain Coder https://www.youtube.com/channel/UC06YNfpGTT93KxJBDF3wStg tutorials
+
+var APPID = "b230ec4526e46a4e2bebac49a0fcf0a7";
+var temp;
+var humidity;
+
+function updateByZip(zip) {
+    var url = "http://api.openweathermap.org/data/2.5/weather?" +
+      "zip=75001" +
+      "&APPID=" + APPID;
+      sendRequest(url);
+}
+
+function sendRequest(url) {
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+      var data = JSON.parse(xmlhttp.responseText);
+      //var weather = {};
+      weather.temp = K2F (data.main.temp);
+      weather.humidity = data.main.humidity;
+      //update(weather);
+    }
+  };
+  xmlhttp.open("GET", url, true);
+  //send constructs URL, sends it off to open weathermap.org, when openweather
+  //responds it runs onreadystatechange function above to construct weather object
+  //pass it to update function which updates UI
+  xmlhttp.send();
+}
+
+function K2F (k) {
+  return Math.round(((9/5)*(k-273)) + 32);
+}
+
+/*function update(weather) {
+  temp = weather.temp;
+  humidity = weather.humidity;
+}*/
+
+window.onload = function() {
+  var weather = {};
+  weather.temp = 0;
+  weather.humidity = 0;
+
+  updateByZip(75001);
 }
 
 //ko.applybindings(new ViewModel());
