@@ -22,7 +22,10 @@
     </nav>
     <div class="col-3" id="side-menu">
       <div id="content">
-        <span class="text">Search for nearby places</span>
+        <span class = "text">Filter the below destinations.</span>
+        <input id="myInput" onkeyup="filterFunction()" placeholder="Filter the list">
+        <br>
+        <span class="text">Or search for nearby places more to your liking.</span>
         <input id="places-search" type="text" placeholder="Ex: Korean food in Dallas">
         <input id="go-places" type="button" value="Go">
         <div id="placesList">

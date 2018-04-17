@@ -226,9 +226,12 @@ function createListInit(x) {
   var placesLength = x.length;
   var listOfPlaces = document.getElementById('placesList');
   for (var i = 0; i < placesLength; i++) {
-    var newDiv = document.createElement('div');
-    newDiv.innerHTML = x[i].title;
-    listOfPlaces.appendChild(newDiv);
+    var newLi = document.createElement('li');
+    newLi.innerHTML = x[i].title;
+    newLi.title = x[i].title;
+    //newLi.setAttribute("a", x[i].title);
+    listOfPlaces.appendChild(newLi);
+    console.log(newLi.title);
   }
 }
 
@@ -240,6 +243,23 @@ function createListForClickAndGo(x) {
     var newDiv = document.createElement('div');
     newDiv.innerHTML = x[i].name;
     listOfPlaces.appendChild(newDiv);
+  }
+}
+
+function filterFunction() {
+  var input, filter, placeList, li, a, i, html;
+  input = document.getElementById('myInput');
+  filter = input.value.toUpperCase();
+  placeList = document.getElementById("placesList");
+  li = placeList.getElementsByTagName('li');
+
+  for (i = 0; i < li.length; i++) {
+    a = li[i].getAttribute("title")[0];
+    if (a.toUpperCase().indexOf(filter) > -1) {
+      li[i].style.display = "";
+    } else {
+      li[i].style.display = "none";
+    }
   }
 }
 
