@@ -229,9 +229,7 @@ function createListInit(x) {
     var newLi = document.createElement('li');
     newLi.innerHTML = x[i].title;
     newLi.title = x[i].title;
-    //newLi.setAttribute("a", x[i].title);
     listOfPlaces.appendChild(newLi);
-    console.log(newLi.title);
   }
 }
 
@@ -246,20 +244,27 @@ function createListForClickAndGo(x) {
   }
 }
 
+//takes placesList and filters list item by text
 function filterFunction() {
-  var input, filter, placeList, li, a, i, html;
+  var input, filter, placeList, li, a, i, m, currentMarkers;
   input = document.getElementById('myInput');
   filter = input.value.toUpperCase();
   placeList = document.getElementById("placesList");
   li = placeList.getElementsByTagName('li');
+  currentMarkers = markers;
 
   for (i = 0; i < li.length; i++) {
-    a = li[i].getAttribute("title")[0];
-    if (a.toUpperCase().indexOf(filter) > -1) {
-      li[i].style.display = "";
-    } else {
-      li[i].style.display = "none";
-    }
+    //grab first letter of title
+      a = li[i].getAttribute("title")[0];
+      //check if filter value is first letter of title
+      if (a.toUpperCase().indexOf(filter) > -1) {
+        li[i].style.display = "";
+        currentMarkers[i].setVisible(true);
+      } else {
+        li[i].style.display = "none";
+        currentMarkers[i].setVisible(false);
+      }
+    //}
   }
 }
 
