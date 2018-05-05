@@ -17,21 +17,18 @@
     <nav class="navbar navbar-dar bg-dark text-light navbar-static">
       <div class="container">
         <a class="navbar-brand">Exploring Dallas</a>
-        <button id="button1" type="button">Toggle Sidebar</button>
+        <button data-bind="click: toggleFunction" id="button1" type="button">Toggle Sidebar</button>
       </div>
     </nav>
     <div class="col-3" id="side-menu">
-      <div id="content">
-        <span class = "text">Filter the below destinations alphabetically.</span>
-        <input id="myInput" onkeyup="filterFunction()" placeholder="Filter the list">
-        <br>
-        <span class="text">Or search for nearby places more to your liking.</span>
-        <input id="places-search" type="text" placeholder="Ex: Korean food in Dallas">
-        <input id="go-places" type="button" value="Go">
-        <div id="placesList">
-        </div>
-      </div>
+      <div class="container">
+            <input placeholder="Filter destinations" data-bind="textInput: filter"/>
+            <ul id="menu" data-bind="foreach: filteredItems">
+              <li data-bind="text: title"></li>
+            </ul>
+        <span class="text">Weather information provided by openweather.org</span>
     </div>
+  </div>
     <div class="container">
       <div class="row">
         <div class="col-9" id="map">

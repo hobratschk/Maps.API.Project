@@ -1,18 +1,96 @@
 //viewmodel - defines data and behavior
-//function ViewModel() {
 var map;
 
 // Create a new blank array for all the listing markers.
 var markers = [];
 
-// Create placemarkers array to use in multiple functions to have control
-// over the number of places that show - separate from locations that load with
-//page
-var placeMarkers = [];
-//}
 
 //openweathermap.org api gets this var
 var weather = {};
+
+var locations = [];
+
+var placesArray = [];
+
+var allLocations = function(data) {
+    this.title = data.title;
+    this.location = data.location;
+    this.marker = data.marker;
+};
+
+//this ViewModel implementation is influenced by https://jsfiddle.net/dy70fe16/1/
+
+var ViewModel = function() {
+
+  var self = this;
+
+  //toggles side menu, if side menu hidden it moves map left, if side menu shown
+  //moves map right - don't need bootstraps collapse function now
+  self.toggleFunction = function () {
+    if ($("#side-menu").is(":visible")) {
+      $("#side-menu").hide();
+      $("#map").css({"right": "25%"});
+    } else {
+      $("#side-menu").show();
+      $("#map").css({"right": "0px"});
+    }
+  };
+
+  self.listLoc = ko.observableArray();
+
+  placesArray.forEach(function(locItem) {
+    self.listLoc.push(new allLocations(locItem))
+  });
+
+  self.filter = ko.observable('');
+
+  self.filteredItems = ko.computed(function() {
+    var filter = self.filter().toLowerCase();
+    if (!filter) {
+    	ko.utils.arrayForEach(self.listLoc(), function (item) {
+        item.marker.setVisible(true);
+      });
+      return self.listLoc();
+    } else {
+      return ko.utils.arrayFilter(self.listLoc(), function(item) {
+        // set all markers visible (false)
+        var result = (item.title.toLowerCase().search(filter) >= 0)
+        item.marker.setVisible(result);
+        return result;
+      });
+    }
+  });
+
+  self.setLoc = function(clickedLoc) {
+    clickedLoc.marker.setAnimation(google.maps.Animation.BOUNCE);
+  };
+//closes ViewModel
+}
+
+//need function for building array on which list relies
+//called in initMap
+function buildShowPlacesArray(x) {
+  for (var i = 0; i <x.length; i++) {
+    placesArray.push({
+      title: x[i].title,
+      marker: x[i].marker
+    });
+  }
+}
+
+//this function toggles the bounce, and the setTimout piece limits to approx 3 bounces
+//each bounce approx 700 ms
+//source: https://stackoverflow.com/questions/7339200/bounce-a-pin-in-google-maps-once
+function toggleBounce(marker) {
+  if (marker.getAnimation() != null) {
+    marker.setAnimation(null);
+  } else {
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+    setTimeout(function() {
+      marker.setAnimation(null);
+    }, 2090);
+  }
+}
 
 //this initMap is a massive function
 function initMap() {
@@ -23,29 +101,23 @@ function initMap() {
     mapTypeControl: false
   });
 
-  //searchbox to execute a places search
-  var searchBox = new google.maps.places.SearchBox(
-    document.getElementById('places-search'));
-    //bias the boundaries within the map
-    searchBox.setBounds(map.getBounds());
-
   // These are the locations that will be shown to the user.
   var locations = [
-    {title: 'Cidercade', location: {lat: 32.8056605, lng: -96.84654390000003}},
-    {title: 'Gui Sushi Korean Japanese Bistro and Bar', location: {lat: 32.79848640000001, lng: -96.8014632}},
-    {title: 'Meso Maya Comida Y Copas', location: {lat: 32.787801, lng: -96.80496040000003}},
-    {title: 'The Mansion Restaurant', location: {lat: 32.8041117, lng: -96.80734359999997}},
-    {title: 'Cane Rosso', location: {lat: 32.78248110000001, lng: -96.78549859999998}},
-    {title: 'Grapevine Bar', location: {lat: 32.8053771, lng: -96.81501279999998}},
-    {title: 'Bowen House', location: {lat: 32.7979765, lng: -96.80196539999997}},
-    {title: 'Louie Louies Piano Bar', location: {lat: 32.7842788, lng: -96.78633539999998}},
-    {title: 'Dallas Museum of Art', location: {lat: 32.7875631, lng: -96.80102369999997}},
-    {title: 'The Samurai Collection', location: {lat: 32.7915351, lng: -96.8062554}},
-    {title: 'Perot Museum of Nature and Science', location: {lat: 32.7868362, lng: -96.8066938}},
-    {title: 'Reunion Tower', location: {lat: 32.7757814, lng: -96.809279}},
-    {title: 'Crown Plaza Dallas Downtown', location: {lat: 32.7808672, lng: -96.80374710000001}},
-    {title: 'Magnolia Hotel', location: {lat: 32.7801662, lng: -96.7990567}},
-    {title: 'Aloft Dallas Downtown', location: {lat: 32.7771609, lng: -96.80106560000002}}
+    {title: 'Cidercade', location: {lat: 32.8056605, lng: -96.84654390000003}, type: "Entertainment"},
+    {title: 'Gui Sushi Korean Japanese Bistro and Bar', location: {lat: 32.79848640000001, lng: -96.8014632}, type: "Restaurant"},
+    {title: 'Meso Maya Comida Y Copas', location: {lat: 32.787801, lng: -96.80496040000003}, type: "Restaurant"},
+    {title: 'The Mansion Restaurant', location: {lat: 32.8041117, lng: -96.80734359999997}, type: "Restaurant"},
+    {title: 'Cane Rosso', location: {lat: 32.78248110000001, lng: -96.78549859999998}, type: "Restaurant"},
+    {title: 'Grapevine Bar', location: {lat: 32.8053771, lng: -96.81501279999998}, type: "Bar"},
+    {title: 'Bowen House', location: {lat: 32.7979765, lng: -96.80196539999997}, type: "Bar"},
+    {title: 'Louie Louies Piano Bar', location: {lat: 32.7842788, lng: -96.78633539999998}, type: "Bar"},
+    {title: 'Dallas Museum of Art', location: {lat: 32.7875631, lng: -96.80102369999997}, type: "Entertainment"},
+    {title: 'The Samurai Collection', location: {lat: 32.7915351, lng: -96.8062554}, type: "Entertainment"},
+    {title: 'Perot Museum of Nature and Science', location: {lat: 32.7868362, lng: -96.8066938}, type: "Entertainment"},
+    {title: 'Reunion Tower', location: {lat: 32.7757814, lng: -96.809279}, type: "Entertainment"},
+    {title: 'Crown Plaza Dallas Downtown', location: {lat: 32.7808672, lng: -96.80374710000001}, type: "Hotel"},
+    {title: 'Magnolia Hotel', location: {lat: 32.7801662, lng: -96.7990567}, type: "Hotel"},
+    {title: 'Aloft Dallas Downtown', location: {lat: 32.7771609, lng: -96.80106560000002}, type: "Hotel"}
   ];
 
   //var largeInfowindow = new google.maps.InfoWindow();
@@ -67,6 +139,7 @@ function initMap() {
       animation: google.maps.Animation.DROP,
       id: i
     })
+    locations[i].marker = marker;
     //push marker to array of markers
     markers.push(marker);
 
@@ -115,174 +188,20 @@ function initMap() {
     map.fitBounds(bounds);
   }
 
-//this function toggles the bounce, and the setTimout piece limits to approx 4 bounces
-//each bounce approx 700 ms
-//source: https://stackoverflow.com/questions/7339200/bounce-a-pin-in-google-maps-once
-  function toggleBounce(marker) {
-    if (marker.getAnimation() != null) {
-      marker.setAnimation(null);
-    } else {
-      marker.setAnimation(google.maps.Animation.BOUNCE);
-      setTimeout(function() {
-        marker.setAnimation(null);
-      }, 2800);
-    }
-  }
+  //creates a list of location on left sidebar (this and createList defined above)
+  buildShowPlacesArray(locations);
 
-  //toggles side menu, if side menu hidden it moves map left, if side menu shown
-  //moves map right - don't need bootstraps collapse function now
-  $("#button1").click(function(){
-    if ($("#side-menu").is(":visible")) {
-      $("#side-menu").hide();
-      $("#map").css({"right": "25%"});
-    } else {
-      $("#side-menu").show();
-      $("#map").css({"right": "0px"});
-    }
-  });
-
-  //listen for event fired when user selects a prediction from picklist
-  //and retrieve more details for that place
-  searchBox.addListener('places_changed', function() {
-    searchBoxPlaces(this);
-  });
-
-  //listen for event fired when user selects prediction and clicks "go"
-  document.getElementById('go-places').addEventListener('click', textSearchPlaces);
-  //creates a list of location on left sidebar (createsList function defined at bottom)
-  createListInit(locations);
+  ko.applyBindings(new ViewModel())
 //closes initMap
-}
-
-//loops thru and hides markers
-function hideMarkers(x) {
-  for (var i = 0; i < x.length; i++) {
-    x[i].setMap(null);
-  }
-}
-
-function searchBoxPlaces(searchBox) {
-  hideMarkers(markers);
-  hideMarkers(placeMarkers);
-  //getPlaces is a searchBox method
-  var places = searchBox.getPlaces();
-  createListForClickAndGo(places);
-  console.log(places);
-  //for each place, get the icon, name and location
-  createMarkersForPlaces(places);
-  if (places.length == 0) {
-    window.alert('We did not find any places matching that search!');
-  }
-}
-
-//function fires when user selects "go" on the places search, uses query string
-function textSearchPlaces() {
-  var bounds = map.getBounds();
-  hideMarkers(markers);
-  hideMarkers(placeMarkers);
-  var placesService = new google.maps.places.PlacesService(map);
-  placesService.textSearch({
-    query: document.getElementById('places-search').value,
-    bounds: bounds
-  }, function(results, status) {
-    if (status === google.maps.places.PlacesServiceStatus.OK) {
-      createMarkersForPlaces(results);
-    }
-    createListForClickAndGo(results);
-  });
-}
-
-//creates markers for each place found in either places search
-function createMarkersForPlaces(places) {
-  var bounds = new google.maps.LatLngBounds();
-  for (var i = 0; i < places.length; i++) {
-    var place = places[i];
-    var icon = {
-      url: place.icon,
-      size: new google.maps.Size(35, 35),
-      origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(15, 34),
-      scaledSize: new google.maps.Size(25, 25)
-    };
-    //create marker for each place
-    var marker = new google.maps.Marker({
-      map: map,
-      icon: icon,
-      title: place.name,
-      position: place.geometry.location,
-      id: place.id
-    });
-    placeMarkers.push(marker);
-    if (place.geometry.viewport) {
-      bounds.union(place.geometry.viewport);
-    } else {
-      bounds.extend(place.geometry.location);
-    }
-  }
-  map.fitBounds(bounds);
-}
-
-function createListInit(x) {
-  var placesLength = x.length;
-  var listOfPlaces = document.getElementById('placesList');
-  for (var i = 0; i < placesLength; i++) {
-    var newLi = document.createElement('li');
-    newLi.innerHTML = x[i].title;
-    newLi.title = x[i].title;
-    listOfPlaces.appendChild(newLi);
-  }
-}
-
-function createListForClickAndGo(x) {
-  clearList();
-  var placesLength = x.length;
-  var listOfPlaces = document.getElementById('placesList');
-  for (var i = 0; i < placesLength; i++) {
-    var newDiv = document.createElement('div');
-    newDiv.innerHTML = x[i].name;
-    listOfPlaces.appendChild(newDiv);
-  }
-}
-
-//takes placesList and filters list item by text
-function filterFunction() {
-  var input, filter, placeList, li, a, i, m, currentMarkers;
-  input = document.getElementById('myInput');
-  filter = input.value.toUpperCase();
-  placeList = document.getElementById("placesList");
-  li = placeList.getElementsByTagName('li');
-  currentMarkers = markers;
-
-  for (i = 0; i < li.length; i++) {
-    //grab first letter of title
-      a = li[i].getAttribute("title")[0];
-      //check if filter value is first letter of title
-      if (a.toUpperCase().indexOf(filter) > -1) {
-        li[i].style.display = "";
-        currentMarkers[i].setVisible(true);
-      } else {
-        li[i].style.display = "none";
-        currentMarkers[i].setVisible(false);
-      }
-    //}
-  }
-}
-
-function clearList() {
-  $('#placesList').empty();
 }
 
 //everything below is for openweather.org API
 //used Captain Coder https://www.youtube.com/channel/UC06YNfpGTT93KxJBDF3wStg tutorials
 
-var APPID = "b230ec4526e46a4e2bebac49a0fcf0a7";
-var temp;
-var humidity;
-
 function updateByZip(zip) {
     var url = "http://api.openweathermap.org/data/2.5/weather?" +
       "zip=75001" +
-      "&APPID=" + APPID;
+      "&APPID=b230ec4526e46a4e2bebac49a0fcf0a7";
       sendRequest(url);
 }
 
@@ -308,11 +227,6 @@ function K2F (k) {
   return Math.round(((9/5)*(k-273)) + 32);
 }
 
-/*function update(weather) {
-  temp = weather.temp;
-  humidity = weather.humidity;
-}*/
-
 window.onload = function() {
   var weather = {};
   weather.temp = 0;
@@ -320,5 +234,3 @@ window.onload = function() {
 
   updateByZip(75001);
 }
-
-//ko.applybindings(new ViewModel());
